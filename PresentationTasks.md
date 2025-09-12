@@ -1,8 +1,6 @@
-- [ ] Work on intro section (slides and talking points): Charles
-- [ ] Section 2 updates: Garrett
-- [ ] Section 3 updates: Charles
-- [ ] Section 3.1 updates: Garrett
-- [ ] Section 4 updates: Charles
-- [ ] Section 4.3: Garrett
-- [ ] Section 5.2: unassigned
-- [ ] Section 5.3: Garrett
+- [ ] Intro: Charles (in progress)
+- [ ] Section 2: Garrett(bundle with Section 3)
+- [ ] Section 3: Garrett(bundle with Section 2)
+- [ ] Section 4: Garrett
+- [ ] Section 5: Charles
+- [ ] Section 6: Charles

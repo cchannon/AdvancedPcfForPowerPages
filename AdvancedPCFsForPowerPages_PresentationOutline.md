@@ -6,102 +6,43 @@
 ## 1. Introduction to PCFs in Power Pages (3 minutes)
 
 ### 1.1 What are PCFs and Why Use Them in Power Pages?
-- Definition and purpose
-- Benefits over standard Power Pages components
-- Use cases specific to Power Pages
 
-### 1.2 PCF Architecture Overview
+**SLIDE:**
+- Welcome and session objectives
+- What are PCFs (PowerApps Component Frameworks) for Power Pages?
+- Why advanced PCFs matter for Power Pages projects
+- What to expect: technical depth, real-world scenarios, and practical takeaways
+- Session roadmap
+
 ```mermaid
 graph TD
     A[PCF Component] --> B[Manifest]
     B --> B1[I/O Definitions]
-    A --> C[Resources]
+    B --> B2[Resources]
+    B --> B3[Features]
     A --> D[Code]
     D --> D1[TypeScript/JavaScript]
-    C --> C2[CSS]
+    B2 --> B2A[CSS]
     D --> D2[HTML]
     A --> E[Solution Package]
     E --> F[Dataverse]
 ```
 
----
+**Talking Points:**
+--need to add brief intros for us both--
+--Why the F would you even do this stuff--
 
-## 2. Basic Integration Methods (8 minutes)
+Welcome, everyone! In this session, we’ll dive deep into the world of PowerApps Component Frameworks (PCFs) and their advanced applications within Power Pages. Whether you’re a developer, architect, or solution designer, you’ll gain a comprehensive understanding of how PCFs can elevate your Power Pages projects.
 
-### 2.1 Form Embedding from Model-Driven Apps
-**Build this out with narrative content ready for presentation.**
-- How model-driven forms work in Power Pages
-- Integration process overview
+We’ll explore a range of advanced use cases, examining both the technical details and the strategic decisions behind each approach. You’ll see real-world examples, learn about the pros and cons of different techniques, and walk away with practical insights you can apply to your own solutions.
 
-#### Sample Code: Basic Form Embedding
-Use the WYSIWYG editor to embed the form < INSERT SCREENSHOT >. For those curious, you can also directly tag the form in...
-
-```html
-<!-- Power Pages Template -->
-<div id="formContainer">
-  {% include 'Form' key: 'contact_form' %}
-</div>
-```
-
-
-### 2.2 Limitations of Form Embedding
-- Limited customization options
-- Performance considerations
-- Styling constraints
-
-#### Sample Code: Form Embedding Limitations
-
-**TEST THIS - IS IT REAL?**
-
-```javascript
-// This won't work as expected in embedded forms
-// because of sandbox limitations
-try {
-  // Attempting to access window.parent can cause issues
-  window.parent.postMessage({ type: "formData", data: formData }, "*");
-} catch (e) {
-  console.error("Cross-frame access denied:", e);
-}
-```
-
-### 2.3 Embedding with Liquid Tagging
-- Liquid tag syntax for PCF embedding
-- Configuration options
-
-#### Sample Code: Liquid Tag Embedding
-```html
-{% pcf control="MyNamespace.MyControl" 
-   data-property-dataset=entities.contact 
-   data-property-primaryfield="fullname" 
-   data-property-additionalfields="emailaddress1,telephone1" 
-   width="100%" 
-   height="400px" %}
-```
-
-### 2.4 Limitations of Liquid Tag Embedding
-- Data binding constraints/quirks
-- Context limitations - DOES NOT WORK in Web Templates
-
-#### Sample Code: Liquid Tag Limitations
-
-**THIS ISN'T REAL. COME UP WITH SOMETHING ELSE**
-```html
-{% pcf control="MyNamespace.MyControl" 
-   data-property-dataset=entities.contact 
-   width="100%" %}
-   
-<!-- The following would not work as expected -->
-<!-- Cannot directly access current user context -->
-<!-- data-property-currentuser=user -->
-```
+This is a hands-on, technical session—expect code samples, architectural diagrams, and candid discussions about what works (and what doesn’t) in the field. By the end, you’ll be equipped to make informed choices and push the boundaries of what’s possible with Power Pages and PCFs.
 
 ---
 
-## 3. Advanced PCF Development for Power Pages (8 minutes)
+### 2 Basic Building & Packaging Strategies
 
-### 3.1 Building & Packaging Strategies
-
-#### 3.1.1 Virtual vs. Vanilla PCF
+#### 2.1 Virtual vs. Vanilla PCF
 - Architectural differences
 - Use case considerations
 
@@ -181,7 +122,7 @@ export class StandardControl implements ComponentFramework.StandardControl<IInpu
 }
 ```
 
-#### 3.1.2 Forcing React Bundling
+#### 2.2 Forcing React Bundling
 - Benefits for complex UIs
 - Configuration approach
 
@@ -209,9 +150,65 @@ npm install stuff and things
 do stuff and go!
 ```
 
-### 3.1 UI Framework Considerations
+## 3. Basic Integration Methods (8 minutes)
 
-#### 3.1.1 Fluent UI vs. Bootstrap
+### 3.1 Form Embedding from Model-Driven Apps
+**Build this out with narrative content ready for presentation.**
+- How model-driven forms work in Power Pages
+- Integration process overview
+
+#### Sample Code: Basic Form Embedding
+Use the WYSIWYG editor to embed the form < INSERT SCREENSHOT >. For those curious, you can also directly tag the form in...
+
+```html
+<!-- Power Pages Template -->
+<div id="formContainer">
+  {% include 'Form' key: 'contact_form' %}
+</div>
+```
+
+
+### 3.2 Limitations of Form Embedding
+- Limited customization options
+- Performance considerations
+- Styling constraints
+
+### 3.3 Embedding with Liquid Tagging
+- Liquid tag syntax for PCF embedding
+- Configuration options
+
+#### Sample Code: Liquid Tag Embedding
+```html
+{% pcf control="MyNamespace.MyControl" 
+   data-property-dataset=entities.contact 
+   data-property-primaryfield="fullname" 
+   data-property-additionalfields="emailaddress1,telephone1" 
+   width="100%" 
+   height="400px" %}
+```
+
+### 3.4 Limitations of Liquid Tag Embedding
+- Data binding constraints/quirks
+- Context limitations - DOES NOT WORK in Web Templates
+
+#### Sample Code: Liquid Tag Limitations
+
+**THIS ISN'T REAL. COME UP WITH SOMETHING ELSE**
+```html
+{% pcf control="MyNamespace.MyControl" 
+   data-property-dataset=entities.contact 
+   width="100%" %}
+   
+<!-- The following would not work as expected -->
+<!-- Cannot directly access current user context -->
+<!-- data-property-currentuser=user -->
+```
+
+---
+
+## 4. UI Framework Considerations
+
+#### 4.1 Fluent UI vs. Bootstrap
 - Comparison of frameworks
 - Integration approaches
 
@@ -307,17 +304,15 @@ export class BootstrapControl implements ComponentFramework.StandardControl<IInp
 ```
 ---
 
-## 4. Overcoming Common Limitations (10 minutes)
+## 5. Overcoming Common Limitations (10 minutes)
 
-### 4.1 Data Access & Integration Strategies
+### 5.1 Data Access & Integration Strategies
+- Liquid-Embedded Fetch
 - Working with WebAPI
-- Batch operations
 - PostMessage API
 - Custom events
 
 #### Sample Code: Advanced Data Access
-
-**RESEARCH: HOW WOULD WE ACTUALLY GET AT WEBAPI DATA? DOES THE WEBAPI OBJ WORK IN POWER PAGES?**
 
 ```typescript
 // Advanced data access in PCF
@@ -398,13 +393,23 @@ export class DataAccessControl implements ComponentFramework.StandardControl<IIn
 }
 ```
 
+#### Sample Code: Cross-Component Communication
+
+
 ```typescript
 //simple example of writing and reading sessionstorage
 sessionStorage.setItem("key", "value");
 const value = sessionStorage.getItem("key");
 ```
 
-#### Sample Code: Cross-Component Communication
+```javascript
+try {
+  // Attempting to access window.parent can cause issues
+  window.parent.postMessage({ type: "formData", data: formData }, "*");
+} catch (e) {
+  console.error("Cross-frame access denied:", e);
+}
+```
 
 **this is good, but let's rework the demo to be easier to understand**
 ```typescript
@@ -468,7 +473,7 @@ export class CommunicatingControl implements ComponentFramework.StandardControl<
 }
 ```
 
-### 4.3 Performance Optimization
+### 5.2 Performance Optimization
 - Lazy loading
 - Virtualization
 - Debouncing and throttling
@@ -589,7 +594,7 @@ export class OptimizedListControl implements ComponentFramework.StandardControl<
 ```
 ---
 
-### 5.2 Handling Page Events
+### 5.3 Handling Page Events
 - Lifecycle events
 - DOM events
 
@@ -669,36 +674,25 @@ export class PageEventControl implements ComponentFramework.StandardControl<IInp
 }
 ```
 
-### 5.3 Working with Liquid Templates
-- Passing data to/from Liquid
-- Enhancing Liquid templates
+## 6. Best Practices & Resources (3 minutes)
 
-#### Sample Code: Liquid Integration
-```typescript
-// AI so crazy, we do it ourselves
-```
----
-
-
-## 7. Best Practices & Resources (3 minutes)
-
-### 7.1 Development Best Practices
+### 6.1 Development Best Practices
 - Modular code structure
 - Error handling and logging
 - Performance considerations
 - Testing strategies
 
-### 7.2 Deployment Considerations
+### 6.2 Deployment Considerations
 - Solution packaging
 - Version management
 - Environment-specific configurations
 
-### 7.3 Troubleshooting Common Issues
+### 6.3 Troubleshooting Common Issues
 - Browser console debugging
 - Network request monitoring
 - Performance profiling
 
-### 7.4 Resources and Documentation
+### 6.4 Resources and Documentation
 - Official Microsoft documentation
 - Community resources
 - Sample repositories
