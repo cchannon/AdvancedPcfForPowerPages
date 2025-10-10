@@ -43,8 +43,11 @@ This is a hands-on, technical session—expect code samples, architectural diagr
 ### 2 Basic Building & Packaging Strategies
 
 #### 2.1 Virtual vs. Vanilla PCF
-- Architectural differences
-- Use case considerations
+##### Virtual
+Virtual components utilize the React and Fluent libraries within the platform to work. This leads to much smaller PCF bundles.
+
+###### Vanilla (Standard)
+Vanilla components do not include React by default. You can include React in a standard component, but it turns into a headache of version management pretty quickly.
 
 ##### Sample Code: Virtual PCF
 ```typescript
