@@ -218,6 +218,11 @@ To do this, you'll need the name of the PCF component, seen here in the Name col
 Then we'll embed it right below the form we embedded in the last example:
 ![alt text](image-11.png)
 
+The code that embeds the PCF directly in Liquid will look something like this:
+```
+{% codecomponent name: dev_examples.powerPagesVirtual %}
+```
+
 Save the file in the code editor, then head back to the WYSIWYG editor and hit sync to make sure the changes from the code editor come through. And sure enough, it's there (seen below as the second "Unable to load this code component in studio" marker)!
 
 ![alt text](image-12.png)
@@ -230,21 +235,6 @@ And here it is in the preview:
 
 - Data binding constraints/quirks
 - Context limitations - DOES NOT WORK in Web Templates
-
-#### Sample Code: Liquid Tag Limitations
-
-**THIS ISN'T REAL. COME UP WITH SOMETHING ELSE**
-
-```html
-{% pcf control="MyNamespace.MyControl" 
-   data-property-dataset=entities.contact 
-   width="100%" %}
-   
-<!-- The following would not work as expected -->
-<!-- Cannot directly access current user context -->
-<!-- data-property-currentuser=user -->
-```
-
 ---
 
 ## 4. UI Framework Considerations
