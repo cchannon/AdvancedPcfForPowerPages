@@ -1,4 +1,5 @@
 # Advanced PCFs for Power Pages
+
 ## Detailed Presentation Outline with Code Examples
 
 ---
@@ -8,6 +9,7 @@
 ### 1.1 What are PCFs and Why Use Them in Power Pages?
 
 **SLIDE:**
+
 - Welcome and session objectives
 - What are PCFs (PowerApps Component Frameworks) for Power Pages?
 - Why advanced PCFs matter for Power Pages projects
@@ -29,7 +31,9 @@ graph TD
 ```
 
 **Talking Points:**
+
 --need to add brief intros for us both--
+
 --Why the F would you even do this stuff--
 
 Welcome, everyone! In this session, we’ll dive deep into the world of PowerApps Component Frameworks (PCFs) and their advanced applications within Power Pages. Whether you’re a developer, architect, or solution designer, you’ll gain a comprehensive understanding of how PCFs can elevate your Power Pages projects.
@@ -43,10 +47,17 @@ This is a hands-on, technical session—expect code samples, architectural diagr
 ### 2 Basic Building & Packaging Strategies
 
 #### 2.1 Virtual vs. Vanilla PCF
-- Architectural differences
-- Use case considerations
+
+##### Virtual
+
+Virtual components utilize the React and Fluent libraries within the platform to work. This leads to much smaller PCF bundles.
+
+###### Vanilla (Standard)
+
+Vanilla components do not include React by default. You can include React in a standard component, but it turns into a headache of version management pretty quickly.
 
 ##### Sample Code: Virtual PCF
+
 ```typescript
 // Virtual PCF component
 export class VirtualControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -78,6 +89,7 @@ export class VirtualControl implements ComponentFramework.StandardControl<IInput
 ```
 
 ##### Sample Code: Vanilla PCF
+
 ```typescript
 // Vanilla PCF component
 export class StandardControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -123,98 +135,119 @@ export class StandardControl implements ComponentFramework.StandardControl<IInpu
 ```
 
 #### 2.2 Forcing React Bundling
-- Benefits for complex UIs
-- Configuration approach
 
-##### Sample Code: React Bundling in PCF
+- When we submitted the abstract for this presentation, it was necessary to force React into your virtual component bundle through "npm install --save react" in order to have it function on a Power Pages site
+- However this no longer seems to be the case, an out of the box virtual component can function on Power Pages without bundling React of Fluent UI.
 
-**HALLUCINATION - FIX ME!**
-```typescript
-// package.json configuration
-{
-  "name": "my-pcf-control",
-  "version": "1.0.0",
-  "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
-  },
-  "pcfConfig": {
-    "bundleStrategy": "react"
-  }
-}
-```
+#### 2.3 Building for Power Pages
 
-**USELESS SAMPLE CODE - REPLACE WITH A REAL EXAMPLE**
-```powershell
-npm install stuff and things
-do stuff and go!
-```
+- As you don't have to force React or Fluent UI into your PCF bundle anymore, building PCF controls for Power Pages has become pretty easy.
+- You can simply initialize your component, write your code, build to a Power Apps solution, and import as you would any other PCF.
 
 ## 3. Basic Integration Methods (8 minutes)
 
-### 3.1 Form Embedding from Model-Driven Apps
-**Build this out with narrative content ready for presentation.**
-- How model-driven forms work in Power Pages
-- Integration process overview
+### 3.1 PCFs on Model-Driven App Forms and How to Use Those in Power Pages
 
-#### Sample Code: Basic Form Embedding
-Use the WYSIWYG editor to embed the form < INSERT SCREENSHOT >. For those curious, you can also directly tag the form in...
+In this example, a PCF is tied to a simple field on a model-driven app form in the Power Apps form editor.
 
-```html
-<!-- Power Pages Template -->
-<div id="formContainer">
-  {% include 'Form' key: 'contact_form' %}
-</div>
+![Form PCF](FormPCF.png)
+
+This is the relevant configuration for the PCF on the MDA form.
+
+![Form PCF Configuration](PCFConfig.png)
+
+Once you're in the Power Pages editor, click the plus button within a section to add a component. That will bring up the following, and you'll click the Form option.
+
+![alt text](image.png)
+
+Clicking the Form option will bring up this dialog, you'll want to use New form.
+
+![alt text](image-1.png)
+
+Which in turn will bring up this dialog. In our case for this example, we keep it fairly simple, we only need the Table, the Form, and a name for the Form within Power Pages.
+
+![alt text](image-2.png)
+
+That makes the form available on your Power Pages site in the WYSIWYG editor. But you may notice that the field labeled PCF Field is just a simple text field, which doesn't look right.
+
+![alt text](image-3.png)
+
+Click on the individual field and you'll be presented with these options. You need to enable the code component.
+
+![alt text](image-4.png)
+
+This is an example of the dialog that appears when you click Enable code component. Make any adjustments you may need to and click Done.
+
+![alt text](image-5.png)
+
+You will likely see this in place of the field you used for the code component. This doesn't mean there's an issue with your component, it just means that the WYSIWYG editor doesn't execute all the code necessary show your component.
+
+![alt text](image-6.png)
+
+If you use the Preview button to look at your site, you should see your PCF as intended.
+
+![alt text](image-7.png)
+
+Our simple example takes the value from a text input and reactively displays that below the input.
+
+### 3.2 Form Embedding with Liquid
+
+Power Pages also uses the Liquid templating language behind the scenes, and devs can edit that code. There is a button in the WYSIWYG editor with the VS Code logo and label that reads "Edit code" that will take you to your site's code.
+
+![alt text](image-8.png)
+
+Once it loads, it should bring up the actual page you were on when you launched the editor. You can look through the onslaught of divs that comprises your page, and eventually find where your form is embedded.
+
+![alt text](image-9.png)
+
+The code that embeds your form in the page will look something like this:
+
+```
+{% entityform name: 'Information (5)' %}
 ```
 
+### 3.3 Limitations of Form Embedding
+Embedding a full form in your Power Pages site does come with limitations however. Your PCF will be tied to whatever form it's on, and will always reflect the context of the form around it. A PCF embedded in a form cannot be separated from the form. But you can use the PCF on its own in a Power Pages site.
 
-### 3.2 Limitations of Form Embedding
-- Limited customization options
-- Performance considerations
-- Styling constraints
+### 3.4 Embedding with Liquid Tagging
+PCFs can be used on an individual basis on a Power Pages site through Liquid tags. The codecomponent Liquid tag works with PCFs to bring PCFs in to a page without needing the PCF to be embedded on a form.
 
-### 3.3 Embedding with Liquid Tagging
-- Liquid tag syntax for PCF embedding
-- Configuration options
+To do this, you'll need the name of the PCF component, seen here in the Name column:
+![alt text](image-10.png)
 
-#### Sample Code: Liquid Tag Embedding
-```html
-{% pcf control="MyNamespace.MyControl" 
-   data-property-dataset=entities.contact 
-   data-property-primaryfield="fullname" 
-   data-property-additionalfields="emailaddress1,telephone1" 
-   width="100%" 
-   height="400px" %}
+Then we'll embed it right below the form we embedded in the last example:
+![alt text](image-11.png)
+
+The code that embeds the PCF directly in Liquid will look something like this:
+```
+{% codecomponent name: dev_examples.powerPagesVirtual %}
 ```
 
-### 3.4 Limitations of Liquid Tag Embedding
+Save the file in the code editor, then head back to the WYSIWYG editor and hit sync to make sure the changes from the code editor come through. And sure enough, it's there (seen below as the second "Unable to load this code component in studio" marker)!
+
+![alt text](image-12.png)
+
+And here it is in the preview:
+
+![alt text](image-13.png)
+
+### 3.5 Limitations of Liquid Tag Embedding
+
 - Data binding constraints/quirks
 - Context limitations - DOES NOT WORK in Web Templates
-
-#### Sample Code: Liquid Tag Limitations
-
-**THIS ISN'T REAL. COME UP WITH SOMETHING ELSE**
-```html
-{% pcf control="MyNamespace.MyControl" 
-   data-property-dataset=entities.contact 
-   width="100%" %}
-   
-<!-- The following would not work as expected -->
-<!-- Cannot directly access current user context -->
-<!-- data-property-currentuser=user -->
-```
-
 ---
 
 ## 4. UI Framework Considerations
 
 #### 4.1 Fluent UI vs. Bootstrap
+
 - Comparison of frameworks
 - Integration approaches
 
 ##### Sample Code: Fluent UI Implementation
 
 **UPDATE THIS TO FLUENT 9 AND MAKE THIS MAKE SENSE**
+
 ```typescript
 // Fluent UI in PCF
 import * as React from 'react';
@@ -258,6 +291,7 @@ export class FluentUIControl implements ComponentFramework.StandardControl<IInpu
 ##### Sample Code: Bootstrap Implementation
 
 **SAME WEIRD COMPONENT IN COMPONENT STUFF - MAKE IT MAKE SENSE**
+
 ```typescript
 // Bootstrap in PCF
 import * as React from 'react';
@@ -302,11 +336,13 @@ export class BootstrapControl implements ComponentFramework.StandardControl<IInp
   // Other required methods...
 }
 ```
+
 ---
 
 ## 5. Overcoming Common Limitations (10 minutes)
 
 ### 5.1 Data Access & Integration Strategies
+
 - Liquid-Embedded Fetch
 - Working with WebAPI
 - PostMessage API
@@ -395,7 +431,6 @@ export class DataAccessControl implements ComponentFramework.StandardControl<IIn
 
 #### Sample Code: Cross-Component Communication
 
-
 ```typescript
 //simple example of writing and reading sessionstorage
 sessionStorage.setItem("key", "value");
@@ -412,6 +447,7 @@ try {
 ```
 
 **this is good, but let's rework the demo to be easier to understand**
+
 ```typescript
 // PCF communicating with other page elements
 export class CommunicatingControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -474,6 +510,7 @@ export class CommunicatingControl implements ComponentFramework.StandardControl<
 ```
 
 ### 5.2 Performance Optimization
+
 - Lazy loading
 - Virtualization
 - Debouncing and throttling
@@ -592,15 +629,18 @@ export class OptimizedListControl implements ComponentFramework.StandardControl<
   // Other required methods...
 }
 ```
+
 ---
 
 ### 5.3 Handling Page Events
+
 - Lifecycle events
 - DOM events
 
 #### Sample Code: Page Event Handling
 
 **some of this might be useful, but seems a little niche. Maybe work this in to other demo areas?**
+
 ```typescript
 // PCF handling page events
 export class PageEventControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -677,22 +717,26 @@ export class PageEventControl implements ComponentFramework.StandardControl<IInp
 ## 6. Best Practices & Resources (3 minutes)
 
 ### 6.1 Development Best Practices
+
 - Modular code structure
 - Error handling and logging
 - Performance considerations
 - Testing strategies
 
 ### 6.2 Deployment Considerations
+
 - Solution packaging
 - Version management
 - Environment-specific configurations
 
 ### 6.3 Troubleshooting Common Issues
+
 - Browser console debugging
 - Network request monitoring
 - Performance profiling
 
 ### 6.4 Resources and Documentation
+
 - Official Microsoft documentation
 - Community resources
 - Sample repositories
