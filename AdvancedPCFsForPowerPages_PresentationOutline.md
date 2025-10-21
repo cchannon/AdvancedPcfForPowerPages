@@ -35,6 +35,11 @@ graph TD
 --need to add brief intros for us both--
 
 --Why the F would you even do this stuff--
+- Scalability
+- To hell with jQuery
+- Good architecture/separation of concerns
+- Better subgrid handling
+- WebAPI access vs writing fetch by hand
 
 Welcome, everyone! In this session, we’ll dive deep into the world of PowerApps Component Frameworks (PCFs) and their advanced applications within Power Pages. Whether you’re a developer, architect, or solution designer, you’ll gain a comprehensive understanding of how PCFs can elevate your Power Pages projects.
 
