@@ -129,48 +129,46 @@ export const HelloWorld: React.FC<IHelloWorldProps> = (props: IHelloWorldProps) 
 
 ##### Sample Code: Vanilla PCF
 
+**index.ts for vanilla PCF example**
 ```typescript
 // Vanilla PCF component
-export class StandardControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-    private _container: HTMLDivElement;
-    private _context: ComponentFramework.Context<IInputs>;
-    private _notifyOutputChanged: () => void;
-    private _value: string;
-    
-    public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-        this._context = context;
-        this._notifyOutputChanged = notifyOutputChanged;
-        this._container = document.createElement("div");
-        
-        // Create UI elements
-        const input = document.createElement("input");
-        input.type = "text";
-        input.addEventListener("change", this._onInputChange);
-        this._container.appendChild(input);
-        
-        // Add to parent container
-        context.container.appendChild(this._container);
+import { IInputs, IOutputs } from "./generated/ManifestTypes";
+
+export class vanillaExample implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+
+    constructor() {
+        // Empty
     }
-    
-    private _onInputChange = (event: Event): void => {
-        this._value = (event.target as HTMLInputElement).value;
-        this._notifyOutputChanged();
+
+    public init(
+        context: ComponentFramework.Context<IInputs>,
+        notifyOutputChanged: () => void,
+        state: ComponentFramework.Dictionary,
+        container: HTMLDivElement
+    ): void {
+        // Add control initialization code
+        const yourMessage = document.createElement("div");
+        yourMessage.setAttribute("id", "yourMessage");
+        yourMessage.innerText = context.parameters.sampleProperty.formatted ?? "No message provided.";
+        container.appendChild(yourMessage);
     }
-    
+
     public updateView(context: ComponentFramework.Context<IInputs>): void {
-        // Update UI based on context changes
+        const yourMessage = document.getElementById("yourMessage");
+        if (yourMessage !== null) {
+            yourMessage.innerText = context.parameters.sampleProperty.formatted ?? "No message provided.";
+        }
     }
-    
+
     public getOutputs(): IOutputs {
-        return {
-            value: this._value
-        };
+        return {};
     }
-    
+
     public destroy(): void {
-        // Cleanup
+        
     }
 }
+
 ```
 
 #### 2.2 Forcing React Bundling
@@ -272,9 +270,9 @@ And here it is in the preview:
 ![alt text](image-13.png)
 
 ### 3.5 Limitations of Liquid Tag Embedding
-
-- Data binding constraints/quirks
-- Context limitations - DOES NOT WORK in Web Templates
+- Code components embedded through Liquid tagging don't carry record context in the same way a PCF on a model-driven app form would
+- You could provide a record to your PCF as a PCF parameter
+- Will not work in Web Templates
 ---
 
 ## 4. UI Framework Considerations
