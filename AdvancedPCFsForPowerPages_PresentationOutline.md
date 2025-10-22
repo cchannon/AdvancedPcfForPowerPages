@@ -129,48 +129,46 @@ export const HelloWorld: React.FC<IHelloWorldProps> = (props: IHelloWorldProps) 
 
 ##### Sample Code: Vanilla PCF
 
+**index.ts for vanilla PCF example**
 ```typescript
 // Vanilla PCF component
-export class StandardControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-    private _container: HTMLDivElement;
-    private _context: ComponentFramework.Context<IInputs>;
-    private _notifyOutputChanged: () => void;
-    private _value: string;
-    
-    public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-        this._context = context;
-        this._notifyOutputChanged = notifyOutputChanged;
-        this._container = document.createElement("div");
-        
-        // Create UI elements
-        const input = document.createElement("input");
-        input.type = "text";
-        input.addEventListener("change", this._onInputChange);
-        this._container.appendChild(input);
-        
-        // Add to parent container
-        context.container.appendChild(this._container);
+import { IInputs, IOutputs } from "./generated/ManifestTypes";
+
+export class vanillaExample implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+
+    constructor() {
+        // Empty
     }
-    
-    private _onInputChange = (event: Event): void => {
-        this._value = (event.target as HTMLInputElement).value;
-        this._notifyOutputChanged();
+
+    public init(
+        context: ComponentFramework.Context<IInputs>,
+        notifyOutputChanged: () => void,
+        state: ComponentFramework.Dictionary,
+        container: HTMLDivElement
+    ): void {
+        // Add control initialization code
+        const yourMessage = document.createElement("div");
+        yourMessage.setAttribute("id", "yourMessage");
+        yourMessage.innerText = context.parameters.sampleProperty.formatted ?? "No message provided.";
+        container.appendChild(yourMessage);
     }
-    
+
     public updateView(context: ComponentFramework.Context<IInputs>): void {
-        // Update UI based on context changes
+        const yourMessage = document.getElementById("yourMessage");
+        if (yourMessage !== null) {
+            yourMessage.innerText = context.parameters.sampleProperty.formatted ?? "No message provided.";
+        }
     }
-    
+
     public getOutputs(): IOutputs {
-        return {
-            value: this._value
-        };
+        return {};
     }
-    
+
     public destroy(): void {
-        // Cleanup
+        
     }
 }
+
 ```
 
 #### 2.2 Forcing React Bundling
@@ -272,9 +270,9 @@ And here it is in the preview:
 ![alt text](image-13.png)
 
 ### 3.5 Limitations of Liquid Tag Embedding
-
-- Data binding constraints/quirks
-- Context limitations - DOES NOT WORK in Web Templates
+- Code components embedded through Liquid tagging don't carry record context in the same way a PCF on a model-driven app form would
+- You could provide a record to your PCF as a PCF parameter
+- Will not work in Web Templates
 ---
 
 ## 4. UI Framework Considerations
@@ -523,7 +521,7 @@ requests.push(transaction);
 const response = await (webApi as any).executemultiple(requests);
 ```
 
-#### Sample Code: Cross-Component Communication //READY
+#### Sample Code: Cross-Component Communication
 
 ```typescript
 //initialize the control and the event bus
@@ -582,7 +580,73 @@ public init(
 ### 5.2 Performance Optimization
 
 - Lazy loading
-- Debouncing 
+
+#### Sample Code: Debouncer
+
+``` typescript
+//debouncer to prevent excessive API calls
+const useDebounce = (value: any, delay: any) => {
+  const [debouncedValue, setDebouncedValue] = React.useState(value);
+
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+```
+
+``` typescript
+const debouncer = useDebounce(inputValue, 300); // 300ms delay
+```
+
+``` typescript
+//search with debouncer, switch on searchType
+  React.useEffect(() => {
+    const query =
+      props.searchType === "contains"
+        ? `?$select=${targetPrimaryColumn},${props.items.getTargetEntityType()}id&$filter=(
+          ${props.filter ? `${props.filter} and ` : ""}
+          ${
+            inputValue.length > 0
+              ? `contains(${targetPrimaryColumn},'${inputValue}')`
+              : ""
+          }
+        )`
+        : `?$select=${targetPrimaryColumn},${props.items.getTargetEntityType()}id
+          ${props.filter ? `&$filter=(${props.filter}` : ""}
+        )`;
+
+    debouncer.debounce(() => {
+      setSearching(true);
+      props.webApi
+        .retrieveMultipleRecords(
+          props.items.getTargetEntityType(),
+          query
+        )
+        .then(
+          (response) => {
+            setOptions(response.entities);
+            setAllOptions([
+              ...allOptions,
+              ...response.entities.filter((x) => !allOptions.includes(x)),
+            ]);
+            setSearching(false);
+          },
+          (error) => {
+            console.error(error);
+          }
+        );
+    });
+  }, [inputValue]);
+```
+
 - throttling
 
 #### Sample Code: Performance Optimized PCF
@@ -595,6 +659,7 @@ public init(
 ### 6.1 Development Best Practices
 
 - Modular code structure
+  - Reusable components are really useful, and a better developer experience
 - Error handling and logging
 - Performance considerations
 - Testing strategies
@@ -613,12 +678,18 @@ public init(
 
 ### 6.4 Resources and Documentation
 
+<<<<<<< HEAD
 - Official Microsoft documentation
   - execute(): https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/execute
   - executeMultiple(): https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/executemultiple
+=======
+- [Official Microsoft documentation](https://learn.microsoft.com/en-us/power-pages/configure/component-framework)
+- [Official Microsoft tutorial](https://learn.microsoft.com/en-us/power-pages/configure/component-framework-tutorial)
+>>>>>>> 5d71a1ff310226995c53cd6d56b60e9367dc303f
 - Community resources
+  - [Carl de Souza blog post](https://carldesouza.com/how-to-use-pcf-controls-in-power-pages/)
 - Sample repositories
-- Learning paths
+  - [Our repository](https://github.com/cchannon/AdvancedPcfForPowerPages)
 
 ---
 
