@@ -2,7 +2,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import { HelloWorld, IHelloWorldProps } from "./HelloWorld";
 import * as React from "react";
 
-export class powerPagesVirtual implements ComponentFramework.ReactControl<IInputs, IOutputs> {
+export class ExecuteMultipleSample implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     private notifyOutputChanged: () => void;
     public _value: string | undefined;
 
@@ -34,7 +34,8 @@ export class powerPagesVirtual implements ComponentFramework.ReactControl<IInput
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-        const props: IHelloWorldProps = { name: context.parameters.sampleProperty.raw ?? "", updateValue: this.updateValue.bind(this), };
+
+        const props: IHelloWorldProps = { name: context.parameters.sampleProperty.raw ?? "", webApi: context.webAPI };
         return React.createElement(
             HelloWorld, props
         );

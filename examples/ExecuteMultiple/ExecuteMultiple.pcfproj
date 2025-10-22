@@ -8,8 +8,8 @@
   <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Pcf.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Pcf.props')" />
 
   <PropertyGroup>
-    <Name>powerPagesVirtual</Name>
-    <ProjectGuid>bccb5929-b00f-4ba1-ad5d-a5372a662ee2</ProjectGuid>
+    <Name>ExecuteMultiple</Name>
+    <ProjectGuid>37c5975e-57f6-4b8d-82d7-d5ef7637abae</ProjectGuid>
     <OutputPath>$(MSBuildThisFileDirectory)out\controls</OutputPath>
   </PropertyGroup>
 
