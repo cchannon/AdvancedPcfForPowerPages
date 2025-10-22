@@ -63,34 +63,68 @@ Vanilla components do not include React by default. You can include React in a s
 
 ##### Sample Code: Virtual PCF
 
+**index.ts for virtual example**
 ```typescript
 // Virtual PCF component
-export class VirtualControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-    private _container: HTMLDivElement;
-    private _context: ComponentFramework.Context<IInputs>;
-    private _notifyOutputChanged: () => void;
-    
-    public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-        this._context = context;
-        this._notifyOutputChanged = notifyOutputChanged;
-        this._container = document.createElement("div");
-        
-        // Virtual controls don't have a direct visual representation
-        // They typically manipulate other elements or provide services
+import { IInputs, IOutputs } from "./generated/ManifestTypes";
+import { HelloWorld, IHelloWorldProps } from "./HelloWorld";
+import * as React from "react";
+
+export class virtualExample implements ComponentFramework.ReactControl<IInputs, IOutputs> {
+    private notifyOutputChanged: () => void;
+
+    constructor() {
+        // Empty
     }
-    
-    public updateView(context: ComponentFramework.Context<IInputs>): void {
-        // Update logic without direct UI manipulation
+
+    public init(
+        context: ComponentFramework.Context<IInputs>,
+        notifyOutputChanged: () => void,
+        state: ComponentFramework.Dictionary
+    ): void {
+        this.notifyOutputChanged = notifyOutputChanged;
     }
-    
+
+    public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
+        const props: IHelloWorldProps = { name: 'Power Apps' };
+        return React.createElement(
+            HelloWorld, props
+        );
+    }
+
     public getOutputs(): IOutputs {
-        return {};
+        return { };
     }
-    
+
     public destroy(): void {
-        // Cleanup
+        // Add code to cleanup control if necessary
     }
 }
+```
+
+**HelloWorld.tsx for virtual example**
+```typescript
+import * as React from 'react';
+import { FluentProvider, Input, Label } from '@fluentui/react-components';
+
+export interface IHelloWorldProps {
+  name?: string;
+}
+
+export const HelloWorld: React.FC<IHelloWorldProps> = (props: IHelloWorldProps) => {
+  const [text, setText] = React.useState<string>("");
+
+    return (
+      <FluentProvider>
+        <Label size='large'>Input label for Fluent example</Label>
+        <br />
+        <Input appearance="outline" id="input1" type="text" onChange={(ev, data) => { setText(data.value) }} />
+        <br />
+        <Label>{text}</Label>
+      </FluentProvider>
+    )
+}
+
 ```
 
 ##### Sample Code: Vanilla PCF
@@ -224,9 +258,10 @@ Then we'll embed it right below the form we embedded in the last example:
 ![alt text](image-11.png)
 
 The code that embeds the PCF directly in Liquid will look something like this:
-```
-{% codecomponent name: dev_examples.powerPagesVirtual %}
-```
+`{% codecomponent name: dev_examples.powerPagesVirtual %}`
+
+And if you need to provide a value to a property in your PCF, those are key/value pairs separated by a colon, like this:
+`{% codecomponent name: dev_examples.powerPagesVirtual controlValue:'Here is a value' %}`
 
 Save the file in the code editor, then head back to the WYSIWYG editor and hit sync to make sure the changes from the code editor come through. And sure enough, it's there (seen below as the second "Unable to load this code component in studio" marker)!
 
