@@ -241,6 +241,18 @@ And here it is in the preview:
 
 #### 4.1 Fluent UI vs. Bootstrap
 
+Fluent UI:
+- Built by Microsoft
+- Adopts similar design language to what already exists in Power Apps
+- Integrated with Microsoft ecosystem
+- Fluent components have issues in Liquid tagging
+
+Bootstrap:
+- Built by Twitter
+- Platform-agnostic
+- More broadly usable
+- Power Pages uses Bootstrap internally
+
 - Comparison of frameworks
 - Integration approaches
 
