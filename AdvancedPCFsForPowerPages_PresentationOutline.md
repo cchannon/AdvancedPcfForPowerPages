@@ -258,99 +258,138 @@ Bootstrap:
 - More broadly usable
 - Power Pages uses Bootstrap internally
 
-- Comparison of frameworks
-- Integration approaches
+#### 4.2 Fluent UI implementations
+Integrating Fluent UI is as easy as adding `--framework react` to your `pac pcf init` command. Using that parameter ensures that React and Fluent UI are bundled with your component and ready for you to use.
 
 ##### Sample Code: Fluent UI Implementation
 
-**UPDATE THIS TO FLUENT 9 AND MAKE THIS MAKE SENSE**
-
+**index.ts for Fluent example**
 ```typescript
-// Fluent UI in PCF
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { PrimaryButton, TextField, Stack, IStackTokens } from '@fluentui/react';
+import { IInputs, IOutputs } from "./generated/ManifestTypes";
+import { HelloWorld, IHelloWorldProps } from "./HelloWorld";
+import * as React from "react";
 
-const stackTokens: IStackTokens = { childrenGap: 10 };
+export class fluentExample implements ComponentFramework.ReactControl<IInputs, IOutputs> {
+    private notifyOutputChanged: () => void;
 
-const FluentComponent: React.FC = () => {
-  const [value, setValue] = React.useState("");
-  
-  return (
-    <Stack tokens={stackTokens}>
-      <TextField 
-        label="Enter value" 
-        value={value} 
-        onChange={(e, newValue) => setValue(newValue || "")} 
-      />
-      <PrimaryButton 
-        text="Submit" 
-        onClick={() => console.log(value)} 
-      />
-    </Stack>
-  );
-};
+    constructor() {
+        // Empty
+    }
 
-export class FluentUIControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-  private _container: HTMLDivElement;
-  
-  public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-    this._container = document.createElement("div");
-    context.container.appendChild(this._container);
-    
-    ReactDOM.render(<FluentComponent />, this._container);
-  }
-  
-  // Other required methods...
+    public init(
+        context: ComponentFramework.Context<IInputs>,
+        notifyOutputChanged: () => void,
+        state: ComponentFramework.Dictionary
+    ): void {
+        this.notifyOutputChanged = notifyOutputChanged;
+    }
+
+    public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
+        const props: IHelloWorldProps = { name: 'Power Apps' };
+        return React.createElement(
+            HelloWorld, props
+        );
+    }
+
+    public getOutputs(): IOutputs {
+        return { };
+    }
+
+    public destroy(): void {
+        // Add code to cleanup control if necessary
+    }
 }
+```
+
+**HelloWorld.tsx for Fluent example**
+```typescript
+import * as React from 'react';
+import { FluentProvider, Input, Label } from '@fluentui/react-components';
+
+export interface IHelloWorldProps {
+  name?: string;
+}
+
+export const HelloWorld: React.FC<IHelloWorldProps> = (props: IHelloWorldProps) => {
+  const [text, setText] = React.useState<string>("");
+
+    return (
+      <FluentProvider>
+        <Label size='large'>Input label for Fluent example</Label>
+        <br />
+        <Input appearance="outline" id="input1" type="text" onChange={(ev, data) => { setText(data.value) }} />
+        <br />
+        <Label>{text}</Label>
+      </FluentProvider>
+    )
+}
+```
+
+#### 4.3 Bootstrap implementation
+- You need to use `npm install bootstrap` to make sure your project includes Bootstrap
+- Once that's done, you need to include it as a resource in ControlManifest.Input.xml
+
+**resources section of ControlManifest.Input.xml for Bootstrap example**
+```xml
+<resources>
+  <code path="index.ts" order="1"/>
+  <css path="../node_modules/bootstrap/dist/css/bootstrap.min.css" order="1" />
+</resources>
 ```
 
 ##### Sample Code: Bootstrap Implementation
 
-**SAME WEIRD COMPONENT IN COMPONENT STUFF - MAKE IT MAKE SENSE**
+**index.ts for Bootstrap example**
 
 ```typescript
 // Bootstrap in PCF
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { IInputs, IOutputs } from "./generated/ManifestTypes";
+import 'bootstrap';
 
-const BootstrapComponent: React.FC = () => {
-  const [value, setValue] = React.useState("");
-  
-  return (
-    <div className="container">
-      <div className="form-group">
-        <label htmlFor="inputValue">Enter value</label>
-        <input 
-          type="text" 
-          className="form-control" 
-          id="inputValue" 
-          value={value} 
-          onChange={(e) => setValue(e.target.value)} 
-        />
-      </div>
-      <button 
-        className="btn btn-primary" 
-        onClick={() => console.log(value)}
-      >
-        Submit
-      </button>
-    </div>
-  );
-};
-
-export class BootstrapControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-  private _container: HTMLDivElement;
-  
-  public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-    this._container = document.createElement("div");
-    context.container.appendChild(this._container);
-    
-    ReactDOM.render(<BootstrapComponent />, this._container);
+export class bootstrapExample
+  implements ComponentFramework.StandardControl<IInputs, IOutputs>
+{
+  constructor() {
+    // Empty
   }
-  
-  // Other required methods...
+
+  public init(
+    context: ComponentFramework.Context<IInputs>,
+    notifyOutputChanged: () => void,
+    state: ComponentFramework.Dictionary,
+    container: HTMLDivElement
+  ): void {
+    // Add control initialization code
+    const formLabel = document.createElement("label");
+    const formInput = document.createElement("input");
+
+    formInput.setAttribute("id", "bootstrapExampleInput1");
+    formInput.setAttribute(
+      "placeholder",
+      "Placeholder text for Bootstrap input element"
+    );
+    formInput.setAttribute("type", "text");
+    formInput.classList.add("form-control");
+
+    formLabel.setAttribute("for", "bootstrapExampleInput1");
+    formLabel.classList.add("form-label");
+    formLabel.innerText = "Input label for Bootstrap example";
+
+    container.appendChild(formLabel);
+    container.appendChild(formInput);
+  }
+
+  public updateView(context: ComponentFramework.Context<IInputs>): void {
+    // Add code to update control view
+  }
+
+  public getOutputs(): IOutputs {
+    return {};
+  }
+
+  public destroy(): void {
+    // Add code to cleanup control if necessary
+  }
 }
 ```
 
