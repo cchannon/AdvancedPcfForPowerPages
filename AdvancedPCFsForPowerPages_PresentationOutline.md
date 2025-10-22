@@ -339,97 +339,38 @@ export class BootstrapControl implements ComponentFramework.StandardControl<IInp
 
 ---
 
-## 5. Overcoming Common Limitations (10 minutes)
-
-### 5.1 Data Access & Integration Strategies
-
-- Liquid-Embedded Fetch
-- Working with WebAPI
-- PostMessage API
-- Custom events
+## 5. Advanced data management topics (10 minutes)
 
 #### Sample Code: Advanced Data Access
 
-```typescript
-// Advanced data access in PCF
-export class DataAccessControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-  private _container: HTMLDivElement;
-  private _context: ComponentFramework.Context<IInputs>;
-  private _cache: Map<string, any> = new Map();
-  
-  public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-    this._context = context;
-    this._container = document.createElement("div");
-    context.container.appendChild(this._container);
-    
-    this._loadData();
-  }
-  
-  private async _loadData(): Promise<void> {
-    try {
-      // Check cache first
-      const cacheKey = "contacts_recent";
-      if (this._cache.has(cacheKey)) {
-        this._renderData(this._cache.get(cacheKey));
-        return;
-      }
-      
-      //Oh AI, you so crazy. Look here instead: https://learn.microsoft.com/en-us/power-apps/developer/data-platform/org-service/execute-multiple-requests
+The PCF WebAPI provides some helpful functions that cover basic use cases, but extended capabilities still need to be coded the old fashioned way...
 
-      // // Prepare batch request
-      // const batch = {
-      //   requests: [
-      //     {
-      //       id: "1",
-      //       method: "GET",
-      //       url: "contacts?$select=contactid,fullname,emailaddress1&$top=10&$orderby=createdon desc"
-      //     },
-      //     {
-      //       id: "2",
-      //       method: "GET",
-      //       url: "accounts?$select=accountid,name&$top=5&$orderby=createdon desc"
-      //     }
-      //   ]
-      // };
-      
-      // // Execute batch request
-      // const response = await fetch(`${this._context.page.getClientUrl()}/api/data/v9.1/$batch`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "Accept": "application/json",
-      //     "OData-MaxVersion": "4.0",
-      //     "OData-Version": "4.0"
-      //   },
-      //   body: JSON.stringify(batch)
-      // });
-      
-      // const batchResponse = await response.json();
-      
-      // Process responses
-      const contacts = batchResponse.responses[0].body.value;
-      
-      // Cache the results (with 5 minute expiration)
-      this._cache.set(cacheKey, contacts);
-      setTimeout(() => this._cache.delete(cacheKey), 5 * 60 * 1000);
-      
-      // Render the data
-      this._renderData(contacts);
-    } catch (error) {
-      console.error("Error loading data:", error);
-      this._container.innerHTML = `<div class="error">Error loading data</div>`;
-    }
+```typescript
+private associateRecordsWithReferences = async (entityReference: ComponentFramework.EntityReference, relationship: string, relatedEntityReference: ComponentFramework.EntityReference) => {
+  if(relatedEntityReference.etn === undefined) {
+      throw new Error("Related entity reference is not valid. an Entity Type Name must be provided.");
   }
-  
-  private _renderData(data: any[]): void {
-    // Render the data...
+  if(entityReference.etn === undefined) {
+      throw new Error("Entity reference is not valid. an Entity Type Name must be provided.");
   }
+  const payload = this.getWebAPIPathForEntityRecord(relatedEntityReference.etn, relatedEntityReference.id.guid) + "/" + relationship + "/$ref";
   
-  // Other required methods...
-}
+  const res = await window.fetch(
+    await this.getWebAPIPathForEntityRecord(entityReference.etn, entityReference.id.guid) + "/" + relationship + "/$ref",
+    this.options.post(payload)
+  ).then((response) => {
+      if (response.ok) {
+          return response.json();
+      } else {
+          throw new Error("Error associating records");
+      }
+  });
+    
+  return res;
+};
 ```
 
-#### Sample Code: Cross-Component Communication
+#### Sample Code: Cross-Component Communication //READY
 
 ```typescript
 //initialize the control and the event bus
@@ -474,7 +415,7 @@ public init(
 
 ```typescript
   (window as any).PCFEventBus.addEventListener('pcfPeerCommunication', (event: CustomEvent) => {
-    if (event.detail.sourceComponent !== 'MyComponentName') { // Avoid self-events
+    if (event.detail.sourceComponent !== 'EventPasserPCF') { // Avoid self-events
         console.log('Received peer event:', event.detail);
         count++;
         const countDiv = document.getElementById("eventCount");
@@ -485,282 +426,16 @@ public init(
   });
 ```
 
-```javascript
-try {
-  // Attempting to access window.parent can cause issues
-  window.parent.postMessage({ type: "formData", data: formData }, "*");
-} catch (e) {
-  console.error("Cross-frame access denied:", e);
-}
-```
-
-**this is good, but let's rework the demo to be easier to understand**
-
-```typescript
-// PCF communicating with other page elements
-export class CommunicatingControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-  private _container: HTMLDivElement;
-  private _context: ComponentFramework.Context<IInputs>;
-  private _value: string;
-  private _notifyOutputChanged: () => void;
-  
-  public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-    this._context = context;
-    this._notifyOutputChanged = notifyOutputChanged;
-    this._container = document.createElement("div");
-    context.container.appendChild(this._container);
-    
-    // Create UI
-    const button = document.createElement("button");
-    button.textContent = "Send Message";
-    button.addEventListener("click", this._sendMessage);
-    this._container.appendChild(button);
-    
-    // Listen for messages from other components
-    window.addEventListener("message", this._handleMessage);
-    
-    // Listen for custom events
-    document.addEventListener("custom:dataUpdate", this._handleCustomEvent as EventListener);
-  }
-  
-  private _sendMessage = (): void => {
-    // Send message to parent window
-    window.parent.postMessage({
-      type: "PCF_DATA_UPDATE",
-      data: { value: "Updated value" }
-    }, "*");
-    
-    // Dispatch custom event
-    const event = new CustomEvent("custom:pcfAction", {
-      detail: { action: "update", value: "Updated value" },
-      bubbles: true
-    });
-    this._container.dispatchEvent(event);
-  }
-  
-  private _handleMessage = (event: MessageEvent): void => {
-    // Process messages from other components
-    if (event.data && event.data.type === "EXTERNAL_UPDATE") {
-      this._value = event.data.value;
-      this._notifyOutputChanged();
-    }
-  }
-  
-  private _handleCustomEvent = (event: CustomEvent): void => {
-    // Process custom events
-    if (event.detail && event.detail.action === "refresh") {
-      // Handle refresh action
-    }
-  }
-  
-  // Other required methods...
-}
-```
-
 ### 5.2 Performance Optimization
 
 - Lazy loading
-- Virtualization
-- Debouncing and throttling
+- Debouncing 
+- throttling
 
 #### Sample Code: Performance Optimized PCF
 
-```typescript
-//simple Fluent control demonstrating lazy loading & virtualization (dataset)
-```
-
-```typescript
-// Performance optimized PCF
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-
-// Utility function for debouncing
-const debounce = (fn: Function, delay: number) => {
-  let timeoutId: number;
-  return (...args: any[]) => {
-    clearTimeout(timeoutId);
-    timeoutId = window.setTimeout(() => fn(...args), delay);
-  };
-};
-
-// Virtualized list component
-const VirtualizedList: React.FC<{items: any[]}> = ({ items }) => {
-  const [visibleRange, setVisibleRange] = React.useState({ start: 0, end: 20 });
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  
-  const updateVisibleRange = () => {
-    if (!containerRef.current) return;
-    
-    const container = containerRef.current;
-    const scrollTop = container.scrollTop;
-    const height = container.clientHeight;
-    
-    // Assuming each item is 40px tall
-    const itemHeight = 40;
-    const visibleItems = Math.ceil(height / itemHeight);
-    const buffer = Math.floor(visibleItems / 2);
-    
-    const start = Math.max(0, Math.floor(scrollTop / itemHeight) - buffer);
-    const end = Math.min(items.length, start + visibleItems + buffer * 2);
-    
-    setVisibleRange({ start, end });
-  };
-  
-  // Debounced scroll handler
-  const handleScroll = React.useMemo(
-    () => debounce(updateVisibleRange, 100),
-    [items.length]
-  );
-  
-  React.useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-      updateVisibleRange();
-      return () => container.removeEventListener('scroll', handleScroll);
-    }
-  }, [handleScroll]);
-  
-  // Calculate total height to maintain scrollbar
-  const totalHeight = items.length * 40;
-  
-  // Calculate offset for visible items
-  const offsetY = visibleRange.start * 40;
-  
-  return (
-    <div 
-      ref={containerRef}
-      style={{ height: '400px', overflow: 'auto' }}
-    >
-      <div style={{ height: `${totalHeight}px`, position: 'relative' }}>
-        <div style={{ position: 'absolute', top: `${offsetY}px`, width: '100%' }}>
-          {items.slice(visibleRange.start, visibleRange.end).map((item, index) => (
-            <div 
-              key={visibleRange.start + index} 
-              style={{ height: '40px', padding: '10px', borderBottom: '1px solid #eee' }}
-            >
-              {item.name}
-            </div>
-          ))}
-        
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export class OptimizedListControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-  private _container: HTMLDivElement;
-  private _items: any[] = [];
-  
-  public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-    this._container = document.createElement("div");
-    context.container.appendChild(this._container);
-    
-    // Generate sample data
-    this._items = Array.from({ length: 10000 }, (_, i) => ({
-      id: i,
-      name: `Item ${i}`,
-      description: `Description for item ${i}`
-    }));
-    
-    this._renderControl();
-  }
-  
-  private _renderControl(): void {
-    ReactDOM.render(
-      <VirtualizedList items={this._items} />,
-      this._container
-    );
-  }
-  
-  // Other required methods...
-}
-```
 
 ---
-
-### 5.3 Handling Page Events
-
-- Lifecycle events
-- DOM events
-
-#### Sample Code: Page Event Handling
-
-**some of this might be useful, but seems a little niche. Maybe work this in to other demo areas?**
-
-```typescript
-// PCF handling page events
-export class PageEventControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
-  private _container: HTMLDivElement;
-  private _context: ComponentFramework.Context<IInputs>;
-  
-  public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void): void {
-    this._context = context;
-    this._container = document.createElement("div");
-    context.container.appendChild(this._container);
-    
-    // Listen for page visibility changes
-    document.addEventListener("visibilitychange", this._handleVisibilityChange);
-    
-    // Listen for page resize
-    window.addEventListener("resize", this._handleResize);
-    
-    // Listen for beforeunload
-    window.addEventListener("beforeunload", this._handleBeforeUnload);
-  }
-  
-  private _handleVisibilityChange = (): void => {
-    if (document.hidden) {
-      // Page is hidden (user switched tabs, minimized window, etc.)
-      this._pauseOperations();
-    } else {
-      // Page is visible again
-      this._resumeOperations();
-    }
-  }
-  
-  private _handleResize = (): void => {
-    // Adjust layout based on new window size
-    this._adjustLayout();
-  }
-  
-  private _handleBeforeUnload = (event: BeforeUnloadEvent): void => {
-    // Check if there are unsaved changes
-    if (this._hasUnsavedChanges()) {
-      // Show confirmation dialog
-      event.preventDefault();
-      event.returnValue = "You have unsaved changes. Are you sure you want to leave?";
-    }
-  }
-  
-  private _pauseOperations(): void {
-    // Pause timers, animations, etc.
-  }
-  
-  private _resumeOperations(): void {
-    // Resume operations
-  }
-  
-  private _adjustLayout(): void {
-    // Adjust layout based on window size
-  }
-  
-  private _hasUnsavedChanges(): boolean {
-    // Check for unsaved changes
-    return false;
-  }
-  
-  public destroy(): void {
-    // Remove event listeners
-    document.removeEventListener("visibilitychange", this._handleVisibilityChange);
-    window.removeEventListener("resize", this._handleResize);
-    window.removeEventListener("beforeunload", this._handleBeforeUnload);
-  }
-  
-  // Other required methods...
-}
-```
 
 ## 6. Best Practices & Resources (3 minutes)
 
