@@ -35,6 +35,11 @@ graph TD
 --need to add brief intros for us both--
 
 --Why the F would you even do this stuff--
+- Scalability
+- To hell with jQuery
+- Good architecture/separation of concerns
+- Better subgrid handling
+- WebAPI access vs writing fetch by hand
 
 Welcome, everyone! In this session, we’ll dive deep into the world of PowerApps Component Frameworks (PCFs) and their advanced applications within Power Pages. Whether you’re a developer, architect, or solution designer, you’ll gain a comprehensive understanding of how PCFs can elevate your Power Pages projects.
 
@@ -444,9 +449,57 @@ export class DataAccessControl implements ComponentFramework.StandardControl<IIn
 #### Sample Code: Cross-Component Communication
 
 ```typescript
-//simple example of writing and reading sessionstorage
-sessionStorage.setItem("key", "value");
-const value = sessionStorage.getItem("key");
+//initialize the control and the event bus
+public init(
+        context: ComponentFramework.Context<IInputs>,
+        notifyOutputChanged: () => void,
+        state: ComponentFramework.Dictionary
+    ): void {
+        this.notifyOutputChanged = notifyOutputChanged;
+        
+        // Create global event bus with consistent naming convention
+        if (!(window as any).PCFEventBus) {
+            (window as any).PCFEventBus = document.createElement('div');
+            // Optional: Add some metadata for debugging
+            (window as any).PCFEventBus.setAttribute('data-pcf-eventbus', 'true');
+            console.log('PCF Event Bus initialized');
+        }
+
+        this.eventBus = (window as any).PCFEventBus;
+    }
+```
+
+```typescript
+  // Create and dispatch a custom event with test data
+  const testValue = {
+      message: "Hello from PCF EventPasser",
+      timestamp: new Date().toISOString(),
+      componentType: "PCF in Power Pages",
+      sourceComponent: "EventPasserPCF"
+  };
+  
+  const peerEvent = new CustomEvent('pcfPeerCommunication', {
+      detail: testValue,
+      bubbles: false
+  });
+  
+  // Dispatch on the global event bus
+  this.eventBus.dispatchEvent(peerEvent);
+  
+  this.notifyOutputChanged();
+```
+
+```typescript
+  (window as any).PCFEventBus.addEventListener('pcfPeerCommunication', (event: CustomEvent) => {
+    if (event.detail.sourceComponent !== 'MyComponentName') { // Avoid self-events
+        console.log('Received peer event:', event.detail);
+        count++;
+        const countDiv = document.getElementById("eventCount");
+        if (countDiv) {
+            countDiv.innerText = "Event Count: " + count;
+        }
+    }
+  });
 ```
 
 ```javascript
