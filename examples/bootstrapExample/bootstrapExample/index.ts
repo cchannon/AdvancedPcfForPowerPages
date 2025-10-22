@@ -39,7 +39,7 @@ export class bootstrapExample
 
     formLabel.setAttribute("for", "bootstrapExampleInput1");
     formLabel.classList.add("form-label");
-    formLabel.innerText = "Input label";
+    formLabel.innerText = "Input label for Bootstrap example";
 
     container.appendChild(formLabel);
     container.appendChild(formInput);
