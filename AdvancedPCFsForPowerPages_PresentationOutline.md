@@ -531,6 +531,7 @@ public init(
 ### 6.1 Development Best Practices
 
 - Modular code structure
+  - Reusable components are really useful, and a better developer experience
 - Error handling and logging
 - Performance considerations
 - Testing strategies
@@ -549,10 +550,12 @@ public init(
 
 ### 6.4 Resources and Documentation
 
-- Official Microsoft documentation
+- [Official Microsoft documentation](https://learn.microsoft.com/en-us/power-pages/configure/component-framework)
+- [Official Microsoft tutorial](https://learn.microsoft.com/en-us/power-pages/configure/component-framework-tutorial)
 - Community resources
+  - [Carl de Souza blog post](https://carldesouza.com/how-to-use-pcf-controls-in-power-pages/)
 - Sample repositories
-- Learning paths
+  - [Our repository](https://github.com/cchannon/AdvancedPcfForPowerPages)
 
 ---
 
