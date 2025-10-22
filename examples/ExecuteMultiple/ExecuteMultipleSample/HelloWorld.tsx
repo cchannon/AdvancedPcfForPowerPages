@@ -137,7 +137,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps> {
       const response = await (webApi as any).executemultiple(requests);
 
       if (response.ok) {
-        console.log("We did it in bulk!");
+        console.log("We did it in bulk AND with transaction rollback safety!");
       }
 
     } catch (error) {

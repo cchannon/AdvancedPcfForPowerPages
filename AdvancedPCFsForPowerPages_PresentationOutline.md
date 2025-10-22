@@ -432,33 +432,95 @@ export class bootstrapExample
 
 ## 5. Advanced data management topics (10 minutes)
 
-#### Sample Code: Advanced Data Access
+PCFs come with specific limitations that can make it challenging to handle data in efficient ways. In particular, inter-control communication and  The approaches that follow are not limited to Power Pages, but they are especially useful in a Power Pages context. 
+
+#### Sample Code: extending WebApi capabilities for greater message access and efficiency
 
 The PCF WebAPI provides some helpful functions that cover basic use cases, but extended capabilities still need to be coded the old fashioned way...
 
+##### .Execute()
+
+The execute method under webapi is not enumerated in the typescript classes and undocumented, so technically this is unsupported, but let's call it a "soft" unsupported because it follows the exact usage patterns of the Xrm webapi execute, so changes to it are almost impossible to imagine...
+
+This can be used for a huge number of message types, including all API Functions and Actions (queueing, sharing, you name it!)
+
 ```typescript
-private associateRecordsWithReferences = async (entityReference: ComponentFramework.EntityReference, relationship: string, relatedEntityReference: ComponentFramework.EntityReference) => {
-  if(relatedEntityReference.etn === undefined) {
-      throw new Error("Related entity reference is not valid. an Entity Type Name must be provided.");
+// Create the request object with getMetadata function
+const createRequest = {
+  etn: "account",
+  payload: payload,
+  getMetadata: function () {
+    return {
+      boundParameter: null,
+      parameterTypes: {},
+      operationType: 2, // 2 = CRUD operation (0 = Action, 1 = Function)
+      operationName: "Create",
+    };
   }
-  if(entityReference.etn === undefined) {
-      throw new Error("Entity reference is not valid. an Entity Type Name must be provided.");
-  }
-  const payload = this.getWebAPIPathForEntityRecord(relatedEntityReference.etn, relatedEntityReference.id.guid) + "/" + relationship + "/$ref";
-  
-  const res = await window.fetch(
-    await this.getWebAPIPathForEntityRecord(entityReference.etn, entityReference.id.guid) + "/" + relationship + "/$ref",
-    this.options.post(payload)
-  ).then((response) => {
-      if (response.ok) {
-          return response.json();
-      } else {
-          throw new Error("Error associating records");
-      }
-  });
-    
-  return res;
 };
+
+// Using webAPI.execute for Create operation
+// Cast to any because execute method exists but is not in TypeScript definitions
+const response = await (webApi as any).execute(createRequest);
+```
+
+The same is true of the ExecuteMultiple operation, exposed much the same way. This enables us to batch up an arbitrary number of requests, calling the API just once to handle all of them instead of nesting, multithreading, or any other approach. This is much more resource efficient and can greatly speed execution of large request batches...
+
+- Execute Multiple
+``` typescript
+// Create the request object with getMetadata function
+const createRequest = {
+  etn: "account",
+  payload: payload,
+  getMetadata: function () {
+    return {
+      boundParameter: null,
+      parameterTypes: {},
+      operationType: 2, // 2 = CRUD operation (0 = Action, 1 = Function)
+      operationName: "Create",
+    };
+  }
+};
+
+requests.push(createRequest);
+
+...
+
+const response = await (webApi as any).executemultiple(requests); 
+```
+
+Going even further, we can use executemultiple to not only bring efficiency to our parallel requests, but also to transaction-bind a request series, providing transaction backout safety in the event of individual transaction failure.
+
+``` typescript
+const payload = {
+  name: "Fabrikam Inc.",
+  telephone1: "555-0100",
+  description: "Created via PCF ExecuteMultiple Sample"
+};
+
+// Create the request object with getMetadata function
+const createRequest = {
+  etn: "account",
+  payload: payload,
+  getMetadata: function () {
+    return {
+      boundParameter: null,
+      parameterTypes: {},
+      operationType: 2, // 2 = CRUD operation (0 = Action, 1 = Function)
+      operationName: "Create",
+    };
+  }
+};
+
+transaction.push(createRequest);
+
+...
+
+requests.push(transaction);
+
+// Using webAPI.execute for Create operation
+// Cast to any because execute method exists but is not in TypeScript definitions
+const response = await (webApi as any).executemultiple(requests);
 ```
 
 #### Sample Code: Cross-Component Communication //READY
@@ -552,6 +614,8 @@ public init(
 ### 6.4 Resources and Documentation
 
 - Official Microsoft documentation
+  - execute(): https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/execute
+  - executeMultiple(): https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/executemultiple
 - Community resources
 - Sample repositories
 - Learning paths
