@@ -1,14 +1,28 @@
+<!-- slide -->
+
 # Advanced PCFs for Power Pages
 
-## Detailed Presentation Outline with Code Examples
+<!-- slide -->
 
----
+## Garrett Pierce
+- bullet
+- bullet
+- bullet
 
+<!-- slide -->
+
+## Charles Channon
+- Dev, architect, small biz owner
+- PPlat since CRM 4.0 (Dev since 2011)
+- 10x Super User recognition (across multiple products)
+- 2X MVP (Power Apps and Power Pages)
+
+<!-- slide -->
 ## 1. Introduction to PCFs in Power Pages (3 minutes)
 
 ### 1.1 What are PCFs and Why Use Them in Power Pages?
 
-**SLIDE:**
+<!-- slide -->
 
 - Welcome and session objectives
 - What are PCFs (PowerApps Component Frameworks) for Power Pages?
@@ -584,15 +598,16 @@ public init(
 #### Sample Code: Debouncer
 
 ``` typescript
-//debouncer to prevent excessive API calls
-const useDebounce = (value: any, delay: any) => {
+const useDebounce = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = React.useState(value);
 
   React.useEffect(() => {
+    // Set up the timeout
     const handler = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
 
+    // Clean up the timeout if value changes before delay expires
     return () => {
       clearTimeout(handler);
     };
@@ -678,16 +693,14 @@ const debouncer = useDebounce(inputValue, 300); // 300ms delay
 
 ### 6.4 Resources and Documentation
 
-<<<<<<< HEAD
-- Official Microsoft documentation
-  - execute(): https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/execute
-  - executeMultiple(): https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/executemultiple
-=======
 - [Official Microsoft documentation](https://learn.microsoft.com/en-us/power-pages/configure/component-framework)
+- [execute()](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/execute)
+- [executeMultiple()](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/executemultiple)
+- [dispatchEvent()](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent)
 - [Official Microsoft tutorial](https://learn.microsoft.com/en-us/power-pages/configure/component-framework-tutorial)
->>>>>>> 5d71a1ff310226995c53cd6d56b60e9367dc303f
 - Community resources
   - [Carl de Souza blog post](https://carldesouza.com/how-to-use-pcf-controls-in-power-pages/)
+  - [Power Pro Dev YouTube](https://www.youtube.com/@PowerProDev) (shameless plug!)
 - Sample repositories
   - [Our repository](https://github.com/cchannon/AdvancedPcfForPowerPages)
 
