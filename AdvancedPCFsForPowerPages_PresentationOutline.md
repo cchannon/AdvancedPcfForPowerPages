@@ -18,9 +18,9 @@
 - 2X MVP (Power Apps and Power Pages)
 
 <!-- slide -->
-## 1. Introduction to PCFs in Power Pages (3 minutes)
+## Introduction to PCFs in Power Pages (3 minutes)
 
-### 1.1 What are PCFs and Why Use Them in Power Pages?
+### What are PCFs and Why Use Them in Power Pages?
 
 <!-- slide -->
 <!-- 
@@ -67,9 +67,9 @@ This is a hands-on, technical session—expect code samples, architectural diagr
 
 ---
 
-### 2 Basic Building & Packaging Strategies
+### Basic Building & Packaging Strategies
 
-#### 2.1 Virtual vs. Vanilla PCF
+#### Virtual vs. Vanilla PCF
 
 <!-- slide -->
 
@@ -79,7 +79,7 @@ Virtual components utilize the React and Fluent libraries within the platform to
 
 <!-- slide -->
 
-###### Vanilla (Standard)
+##### Vanilla (Standard)
 
 Vanilla components do not include React by default. You can include React in a standard component, but it turns into a headache of version management pretty quickly.
 
@@ -201,23 +201,23 @@ export class vanillaExample implements ComponentFramework.StandardControl<IInput
 ---
 <!-- slide -->
 
-#### 2.2 Forcing React Bundling
+#### Forcing React Bundling
 
 - When we submitted the abstract for this presentation, it was necessary to force React into your virtual component bundle through "npm install --save react" in order to have it function on a Power Pages site
 - However this no longer seems to be the case, an out of the box virtual component can function on Power Pages without bundling React of Fluent UI.
 
 <!-- slide -->
 
-#### 2.3 Building for Power Pages
+#### Building for Power Pages
 
 - As you don't have to force React or Fluent UI into your PCF bundle anymore, building PCF controls for Power Pages has become pretty easy.
 - You can simply initialize your component, write your code, build to a Power Apps solution, and import as you would any other PCF.
 
 <!-- slide -->
 
-## 3. Basic Integration Methods (8 minutes)
+## Basic Integration Methods (8 minutes)
 
-### 3.1 PCFs on Model-Driven App Forms and How to Use Those in Power Pages
+### PCFs on Model-Driven App Forms and How to Use Those in Power Pages
 
 <!-- slide -->
 
@@ -283,7 +283,7 @@ Our simple example takes the value from a text input and reactively displays tha
 
 <!-- slide -->
 
-### 3.2 Form Embedding with Liquid
+### Form Embedding with Liquid
 
 Power Pages also uses the Liquid templating language behind the scenes, and devs can edit that code. There is a button in the WYSIWYG editor with the VS Code logo and label that reads "Edit code" that will take you to your site's code.
 
@@ -302,21 +302,23 @@ The code that embeds your form in the page will look something like this:
 ```
 {% entityform name: 'Information (5)' %}
 ```
-
+---
 <!-- slide -->
 
-### 3.3 Limitations of Form Embedding
+### Limitations of Form Embedding
 Embedding a full form in your Power Pages site does come with limitations however. Your PCF will be tied to whatever form it's on, and will always reflect the context of the form around it. A PCF embedded in a form cannot be separated from the form. But you can use the PCF on its own in a Power Pages site.
 
 <!-- slide -->
 
-### 3.4 Embedding with Liquid Tagging
+### Embedding with Liquid Tagging
 PCFs can be used on an individual basis on a Power Pages site through Liquid tags. The codecomponent Liquid tag works with PCFs to bring PCFs in to a page without needing the PCF to be embedded on a form.
 
 <!-- slide -->
 
 To do this, you'll need the name of the PCF component, seen here in the Name column:
 ![alt text](image-10.png)
+
+<!-- slide -->
 
 Then we'll embed it right below the form we embedded in the last example:
 ![alt text](image-11.png)
@@ -343,7 +345,7 @@ And here it is in the preview:
 
 <!-- slide -->
 
-### 3.5 Limitations of Liquid Tag Embedding
+### Limitations of Liquid Tag Embedding
 - Code components embedded through Liquid tagging don't carry record context in the same way a PCF on a model-driven app form would
 - You could provide a record to your PCF as a PCF parameter
 - Will not work in Web Templates
@@ -351,9 +353,9 @@ And here it is in the preview:
 
 <!-- slide -->
 
-## 4. UI Framework Considerations
+## UI Framework Considerations
 
-#### 4.1 Fluent UI vs. Bootstrap
+### Fluent UI vs. Bootstrap
 
 | Fluent UI | Bootstrap |
 |-----------|-----------|
@@ -364,12 +366,12 @@ And here it is in the preview:
 
 <!-- slide -->
 
-#### 4.2 Fluent UI implementations
+### Fluent UI implementations
 Integrating Fluent UI is as easy as adding `--framework react` to your `pac pcf init` command. Using that parameter ensures that React and Fluent UI are bundled with your component and ready for you to use.
 
 <!-- slide -->
 
-##### Sample Code: Fluent UI Implementation
+#### Sample Code: Fluent UI Implementation
 
 **index.ts for Fluent example**
 ```typescript
@@ -408,7 +410,7 @@ export class fluentExample implements ComponentFramework.ReactControl<IInputs, I
     }
 }
 ```
-
+---
 <!-- slide -->
 
 **HelloWorld.tsx for Fluent example**
@@ -434,10 +436,10 @@ export const HelloWorld: React.FC<IHelloWorldProps> = (props: IHelloWorldProps) 
     )
 }
 ```
-
+---
 <!-- slide -->
 
-#### 4.3 Bootstrap implementation
+### Bootstrap implementation
 - You need to use `npm install bootstrap` to make sure your project includes Bootstrap
 - Once that's done, you need to include it as a resource in ControlManifest.Input.xml
 
@@ -448,12 +450,10 @@ export const HelloWorld: React.FC<IHelloWorldProps> = (props: IHelloWorldProps) 
   <css path="../node_modules/bootstrap/dist/css/bootstrap.min.css" order="1" />
 </resources>
 ```
-
+---
 <!-- slide -->
 
-##### Sample Code: Bootstrap Implementation
-
-**index.ts for Bootstrap example**
+#### Sample Code: Bootstrap Implementation
 
 ```typescript
 // Bootstrap in PCF
@@ -511,19 +511,19 @@ export class bootstrapExample
 
 <!-- slide -->
 
-## 5. Advanced data management topics
+## Advanced data management topics
 
 PCFs come with specific limitations that can make it challenging to handle data in efficient ways. In particular, inter-control communication and  The approaches that follow are not limited to Power Pages, but they are especially useful in a Power Pages context. 
 
 <!-- slide -->
 
-#### Sample Code: extending WebApi capabilities for greater message access and efficiency
+### Extending WebApi capabilities for greater message access and efficiency
 
 The PCF WebAPI provides some helpful functions that cover basic use cases, but extended capabilities still need to be coded the old fashioned way...
 
 <!-- slide -->
 
-##### .Execute()
+### .Execute()
 
 <!-- The execute method under webapi is not enumerated in the typescript classes and undocumented, so technically this is unsupported, but let's call it a "soft" unsupported because it follows the exact usage patterns of the Xrm webapi execute, so changes to it are almost impossible to imagine...
 
@@ -553,7 +553,7 @@ const response = await (webApi as any).execute(createRequest);
 
 <!-- The same is true of the ExecuteMultiple operation, exposed much the same way. This enables us to batch up an arbitrary number of requests, calling the API just once to handle all of them instead of nesting, multithreading, or any other approach. This is much more resource efficient and can greatly speed execution of large request batches... -->
 
-- Execute Multiple
+### executeMultiple()
 ``` typescript
 // Create the request object with getMetadata function
 const createRequest = {
@@ -579,6 +579,8 @@ const response = await (webApi as any).executemultiple(requests);
 <!-- slide -->
 <!-- 
 Going even further, we can use executemultiple to not only bring efficiency to our parallel requests, but also to transaction-bind a request series, providing transaction backout safety in the event of individual transaction failure. -->
+
+### beastmode()
 
 ``` typescript
 const payload = {
@@ -614,7 +616,8 @@ const response = await (webApi as any).executemultiple(requests);
 ---
 <!-- slide -->
 
-#### Sample Code: Cross-Component Communication
+### Sample Code: Cross-Component Communication
+#### A simple event bus for client-side events
 
 ```typescript
 //initialize the control and the event bus
@@ -636,7 +639,7 @@ public init(
         this.eventBus = (window as any).PCFEventBus;
     }
 ```
-
+---
 <!-- slide -->
 
 ```typescript
@@ -658,7 +661,7 @@ public init(
   
   this.notifyOutputChanged();
 ```
-
+---
 <!-- slide -->
 
 ```typescript
@@ -673,7 +676,7 @@ public init(
     }
   });
 ```
-
+---
 <!-- slide -->
 
 ### 5.2 Performance Optimization
@@ -731,13 +734,13 @@ const useDebounce = (value: string, delay: number) => {
   return debouncedValue;
 };
 ```
-
+---
 <!-- slide -->
 
 ``` typescript
 const debouncer = useDebounce(inputValue, 300); // 300ms delay
 ```
-
+---
 <!-- slide -->
 
 ``` typescript
@@ -780,22 +783,20 @@ const debouncer = useDebounce(inputValue, 300); // 300ms delay
     });
   }, [inputValue]);
 ```
-
+---
 <!-- slide -->
 
 ---
 
 ## 6. Resources
 
-- [Official Microsoft documentation](https://learn.microsoft.com/en-us/power-pages/configure/component-framework)
+- [Microsoft PCF documentation](https://learn.microsoft.com/en-us/power-pages/configure/component-framework)
+- [Microsoft PCF tutorial](https://learn.microsoft.com/en-us/power-pages/configure/component-framework-tutorial)
 - [execute()](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/execute)
 - [executeMultiple()](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/executemultiple)
 - [dispatchEvent()](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent)
-- [Official Microsoft tutorial](https://learn.microsoft.com/en-us/power-pages/configure/component-framework-tutorial)
-- Community resources
-  - [Carl de Souza blog post](https://carldesouza.com/how-to-use-pcf-controls-in-power-pages/)
-  - [Power Pro Dev YouTube](https://www.youtube.com/@PowerProDev) (shameless plug!)
-- Sample repositories
-  - [Our repository](https://github.com/cchannon/AdvancedPcfForPowerPages)
+- [Carl de Souza blog post](https://carldesouza.com/how-to-use-pcf-controls-in-power-pages/)
+- [Power Pro Dev YouTube](https://www.youtube.com/@PowerProDev) (shameless plug!)
+- [Our repository](https://github.com/cchannon/AdvancedPcfForPowerPages)
 
 ---
