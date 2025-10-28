@@ -5,9 +5,9 @@
 <!-- slide -->
 
 ## Garrett Pierce
-- bullet
-- bullet
-- bullet
+- Dev, 5 years in Power Platform
+- Avid rabbit hole explorer
+- Love to see how far I can push Power Pages
 
 <!-- slide -->
 
