@@ -829,5 +829,6 @@ const debouncer = useDebounce(inputValue, 300); // 300ms delay
 - [Carl de Souza blog post](https://carldesouza.com/how-to-use-pcf-controls-in-power-pages/)
 - [Power Pro Dev YouTube](https://www.youtube.com/@PowerProDev) (shameless plug!)
 - [Our repository](https://github.com/cchannon/AdvancedPcfForPowerPages)
+- [pcf-webapi-ext on npm](https://www.npmjs.com/package/pcf-webapi-ext?activeTab=readme)
 
 ---
