@@ -14,8 +14,8 @@
 ## Charles Channon
 - Dev, architect, small biz owner
 - PPlat since CRM 4.0 (Dev since 2011)
-- 10x Super User recognition (across multiple products)
-- 2X MVP (Power Apps and Power Pages)
+- 10x Super User recognition (Power Apps, Power Pages, Power Automate)
+- MVP (Power Apps and Power Pages)
 
 <!-- slide -->
 ## Introduction to PCFs in Power Pages
@@ -366,6 +366,10 @@ And here it is in the preview:
 
 <!-- slide -->
 
+**DEMO**
+
+<!-- slide -->
+
 ### Fluent UI implementations
 Integrating Fluent UI is as easy as adding `--framework react` to your `pac pcf init` command. Using that parameter ensures that React and Fluent UI are bundled with your component and ready for you to use.
 
@@ -554,7 +558,6 @@ const response = await (webApi as any).execute(createRequest);
 
 ### .executeMultiple()
 ``` typescript
-// Create the request object with getMetadata function
 const createRequest = {
   etn: "account",
   payload: payload,
@@ -588,7 +591,6 @@ const payload = {
   description: "Created via PCF ExecuteMultiple Sample"
 };
 
-// Create the request object with getMetadata function
 const createRequest = {
   etn: "account",
   payload: payload,
@@ -608,11 +610,37 @@ transaction.push(createRequest);
 
 requests.push(transaction);
 
-// Using webAPI.execute for Create operation
-// Cast to any because execute method exists but is not in TypeScript definitions
 const response = await (webApi as any).executemultiple(requests);
 ```
 ---
+<!-- slide -->
+
+**DEMO**
+
+<!-- slide -->
+
+#### And yes, we can still do it without .webapi...
+
+``` typescript
+private associateRecordsWithStrings = async (entityName: string, recordId: string, relationship: string, relatedEntityName: string, relatedRecordId: string) => {
+    const payload = this.getWebAPIPathForEntityRecord(relatedEntityName, relatedRecordId) + "/" + relationship + "/$ref";
+    
+    const res = await window.fetch(
+        await this.getWebAPIPathForEntityRecord(entityName, recordId) + "/" + relationship + "/$ref",
+        this.options.post(payload)
+        ).then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error("Error associating records");
+            }
+        });
+        
+        return res;
+}
+```
+---
+
 <!-- slide -->
 
 ### Sample Code: Cross-Component Communication
@@ -676,6 +704,10 @@ public init(
   });
 ```
 ---
+<!-- slide -->
+
+**DEMO**
+
 <!-- slide -->
 
 ### Performance Optimization
@@ -783,7 +815,9 @@ const debouncer = useDebounce(inputValue, 300); // 300ms delay
 ---
 <!-- slide -->
 
----
+**DEMO**
+
+<!-- slide -->
 
 ## Resources
 
