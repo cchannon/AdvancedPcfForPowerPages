@@ -654,38 +654,13 @@ const debouncer = useDebounce(inputValue, 300); // 300ms delay
 
 ---
 
-## 6. Best Practices & Resources (3 minutes)
+## 6 Resources and Documentation
 
-### 6.1 Development Best Practices
-
-- Modular code structure
-  - Reusable components are really useful, and a better developer experience
-- Error handling and logging
-- Performance considerations
-- Testing strategies
-
-### 6.2 Deployment Considerations
-
-- Solution packaging
-- Version management
-- Environment-specific configurations
-
-### 6.3 Troubleshooting Common Issues
-
-- Browser console debugging
-- Network request monitoring
-- Performance profiling
-
-### 6.4 Resources and Documentation
-
-<<<<<<< HEAD
 - Official Microsoft documentation
   - execute(): https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/execute
   - executeMultiple(): https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/executemultiple
-=======
 - [Official Microsoft documentation](https://learn.microsoft.com/en-us/power-pages/configure/component-framework)
 - [Official Microsoft tutorial](https://learn.microsoft.com/en-us/power-pages/configure/component-framework-tutorial)
->>>>>>> 5d71a1ff310226995c53cd6d56b60e9367dc303f
 - Community resources
   - [Carl de Souza blog post](https://carldesouza.com/how-to-use-pcf-controls-in-power-pages/)
 - Sample repositories
