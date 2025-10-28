@@ -51,7 +51,7 @@ export class HelloWorld extends React.Component<IHelloWorldProps> {
   private emClickHandler = async () => {
     const { webApi } = this.props;
 
-    var requests = [];
+    const requests = [];
 
     try {
       for (let i = 0; i < 3; i++) {
@@ -97,11 +97,9 @@ export class HelloWorld extends React.Component<IHelloWorldProps> {
   public advancedEMClickHandler = async () => {
     const { webApi } = this.props;
 
-    var requests = [];
+    const requests = [];
 
-    var transaction = [];
-
-    
+    const transaction = [];
 
     try {
       for (let i = 0; i < 3; i++) {
@@ -127,8 +125,50 @@ export class HelloWorld extends React.Component<IHelloWorldProps> {
         };
 
         requests.push(createRequest);
-        transaction.push(createRequest);
       }
+
+      const payload = {
+        name: "Fabrikam Inc.",
+        telephone1: "555-0100",
+        description: "Created via PCF ExecuteMultiple Sample"
+      };
+
+      // Create the request object with getMetadata function
+      let createRequest = {
+        etn: "account",
+        payload: payload,
+        getMetadata: function () {
+          return {
+            boundParameter: null,
+            parameterTypes: {},
+            operationType: 2, // 2 = CRUD operation (0 = Action, 1 = Function)
+            operationName: "Create",
+          };
+        }
+      };
+
+      transaction.push(createRequest);
+
+      const pld = {
+        fullname: "John Doe",
+        emailaddress1: "jdoe@test.test"
+      };
+
+      // Create the request object with getMetadata function
+      createRequest = {
+        etn: "contact",
+        payload: payload,
+        getMetadata: function () {
+          return {
+            boundParameter: null,
+            parameterTypes: {},
+            operationType: 2, // 2 = CRUD operation (0 = Action, 1 = Function)
+            operationName: "Create",
+          };
+        }
+      };
+
+      transaction.push(createRequest);
 
       requests.push(transaction);
 

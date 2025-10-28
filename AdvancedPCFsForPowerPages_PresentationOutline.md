@@ -18,7 +18,7 @@
 - 2X MVP (Power Apps and Power Pages)
 
 <!-- slide -->
-## Introduction to PCFs in Power Pages (3 minutes)
+## Introduction to PCFs in Power Pages
 
 ### What are PCFs and Why Use Them in Power Pages?
 
@@ -215,7 +215,7 @@ export class vanillaExample implements ComponentFramework.StandardControl<IInput
 
 <!-- slide -->
 
-## Basic Integration Methods (8 minutes)
+## Basic Integration Methods
 
 ### PCFs on Model-Driven App Forms and How to Use Those in Power Pages
 
@@ -443,7 +443,6 @@ export const HelloWorld: React.FC<IHelloWorldProps> = (props: IHelloWorldProps) 
 - You need to use `npm install bootstrap` to make sure your project includes Bootstrap
 - Once that's done, you need to include it as a resource in ControlManifest.Input.xml
 
-**resources section of ControlManifest.Input.xml for Bootstrap example**
 ```xml
 <resources>
   <code path="index.ts" order="1"/>
@@ -553,7 +552,7 @@ const response = await (webApi as any).execute(createRequest);
 
 <!-- The same is true of the ExecuteMultiple operation, exposed much the same way. This enables us to batch up an arbitrary number of requests, calling the API just once to handle all of them instead of nesting, multithreading, or any other approach. This is much more resource efficient and can greatly speed execution of large request batches... -->
 
-### executeMultiple()
+### .executeMultiple()
 ``` typescript
 // Create the request object with getMetadata function
 const createRequest = {
@@ -580,7 +579,7 @@ const response = await (webApi as any).executemultiple(requests);
 <!-- 
 Going even further, we can use executemultiple to not only bring efficiency to our parallel requests, but also to transaction-bind a request series, providing transaction backout safety in the event of individual transaction failure. -->
 
-### beastmode()
+### .beastmode()
 
 ``` typescript
 const payload = {
@@ -679,11 +678,9 @@ public init(
 ---
 <!-- slide -->
 
-### 5.2 Performance Optimization
+### Performance Optimization
 
 #### Sample Code: Memory Protection and Good Hygiene
-
-<!-- slide -->
 
 <!-- Why the destroy method matters:
 
@@ -788,7 +785,7 @@ const debouncer = useDebounce(inputValue, 300); // 300ms delay
 
 ---
 
-## 6. Resources
+## Resources
 
 - [Microsoft PCF documentation](https://learn.microsoft.com/en-us/power-pages/configure/component-framework)
 - [Microsoft PCF tutorial](https://learn.microsoft.com/en-us/power-pages/configure/component-framework-tutorial)
