@@ -532,6 +532,8 @@ The PCF WebAPI provides some helpful functions that cover basic use cases, but e
 
 This can be used for a huge number of message types, including all API Functions and Actions (queueing, sharing, you name it!) -->
 
+You might recognize this...
+
 ```typescript
 // Create the request object with getMetadata function
 const createRequest = {
@@ -554,92 +556,26 @@ const response = await (webApi as any).execute(createRequest);
 ---
 <!-- slide -->
 
-<!-- The same is true of the ExecuteMultiple operation, exposed much the same way. This enables us to batch up an arbitrary number of requests, calling the API just once to handle all of them instead of nesting, multithreading, or any other approach. This is much more resource efficient and can greatly speed execution of large request batches... -->
+BUT... The WebApi implementation in Pages is not consistent with the implementation on MDAs - EVEN WHEN IN AN EMBEDDED FORM!
 
-### .executeMultiple()
-``` typescript
-const createRequest = {
-  etn: "account",
-  payload: payload,
-  getMetadata: function () {
-    return {
-      boundParameter: null,
-      parameterTypes: {},
-      operationType: 2, // 2 = CRUD operation (0 = Action, 1 = Function)
-      operationName: "Create",
-    };
-  }
-};
-
-requests.push(createRequest);
-
-...
-
-const response = await (webApi as any).executemultiple(requests); 
-```
----
 <!-- slide -->
-<!-- 
-Going even further, we can use executemultiple to not only bring efficiency to our parallel requests, but also to transaction-bind a request series, providing transaction backout safety in the event of individual transaction failure. -->
-
-### .beastmode()
 
 ``` typescript
-const payload = {
-  name: "Fabrikam Inc.",
-  telephone1: "555-0100",
-  description: "Created via PCF ExecuteMultiple Sample"
-};
-
-const createRequest = {
-  etn: "account",
-  payload: payload,
-  getMetadata: function () {
-    return {
-      boundParameter: null,
-      parameterTypes: {},
-      operationType: 2, // 2 = CRUD operation (0 = Action, 1 = Function)
-      operationName: "Create",
-    };
+  const retrieveEnvironmentVariableValue = async () => {
+    const url = encodeURI(`${props.Uri}RetrieveEnvironmentVariableValue(DefinitionSchemaName=@p1)?@p1='ktcs_ExampleEV'`);
+    const response = await fetch(url, options.get).then(async res => {
+      const response = await res.json();
+      return;
+    }).catch(err =>
+      console.error(err)
+    );
+    return;
   }
-};
-
-transaction.push(createRequest);
-
-...
-
-requests.push(transaction);
-
-const response = await (webApi as any).executemultiple(requests);
 ```
 ---
 <!-- slide -->
 
 **DEMO**
-
-<!-- slide -->
-
-#### And yes, we can still do it without .webapi...
-
-``` typescript
-private associateRecordsWithStrings = async (entityName: string, recordId: string, relationship: string, relatedEntityName: string, relatedRecordId: string) => {
-    const payload = this.getWebAPIPathForEntityRecord(relatedEntityName, relatedRecordId) + "/" + relationship + "/$ref";
-    
-    const res = await window.fetch(
-        await this.getWebAPIPathForEntityRecord(entityName, recordId) + "/" + relationship + "/$ref",
-        this.options.post(payload)
-        ).then((response) => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error("Error associating records");
-            }
-        });
-        
-        return res;
-}
-```
----
 
 <!-- slide -->
 
@@ -824,7 +760,6 @@ const debouncer = useDebounce(inputValue, 300); // 300ms delay
 - [Microsoft PCF documentation](https://learn.microsoft.com/en-us/power-pages/configure/component-framework)
 - [Microsoft PCF tutorial](https://learn.microsoft.com/en-us/power-pages/configure/component-framework-tutorial)
 - [execute()](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/execute)
-- [executeMultiple()](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-webapi/online/executemultiple)
 - [dispatchEvent()](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent)
 - [Carl de Souza blog post](https://carldesouza.com/how-to-use-pcf-controls-in-power-pages/)
 - [Power Pro Dev YouTube](https://www.youtube.com/@PowerProDev) (shameless plug!)

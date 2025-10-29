@@ -2,7 +2,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import { HelloWorld, IHelloWorldProps } from "./HelloWorld";
 import * as React from "react";
 
-export class ExecuteMultipleSample implements ComponentFramework.ReactControl<IInputs, IOutputs> {
+export class WebAPISample implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     private notifyOutputChanged: () => void;
     public _value: string | undefined;
 
@@ -34,16 +34,11 @@ export class ExecuteMultipleSample implements ComponentFramework.ReactControl<II
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-
-        const props: IHelloWorldProps = { name: context.parameters.sampleProperty.raw ?? "", webApi: context.webAPI };
+        const serviceUri = (context as any).page.getClientUrl();
+        const props: IHelloWorldProps = { name: context.parameters.sampleProperty.raw ?? "", webApi: context.webAPI, Uri: serviceUri + "/api/data/v9.2/" };
         return React.createElement(
             HelloWorld, props
         );
-    }
-
-    private updateValue(value: string) {
-        this._value = value;
-        this.notifyOutputChanged();
     }
 
     /**
