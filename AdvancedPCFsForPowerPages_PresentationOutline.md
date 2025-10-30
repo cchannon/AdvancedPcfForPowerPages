@@ -748,6 +748,149 @@ const debouncer = useDebounce(inputValue, 300); // 300ms delay
     });
   }, [inputValue]);
 ```
+
+<!-- slide -->
+
+#### Sample Code: Throttling
+
+When to use: Limit how often a function executes during rapid input (e.g., scrolling, resize, mouse move, or high-frequency typing where you want periodic updates).
+
+Key difference vs Debounce:
+- Debounce waits until the user stops triggering events
+- Throttle guarantees execution at most once every N ms while events continue
+
+```typescript
+// useThrottle hook — updates value at most once per `delay` window
+import * as React from 'react';
+
+export function useThrottle<T>(value: T, delay = 300): T {
+  const [throttled, setThrottled] = React.useState(value);
+  const lastRan = React.useRef<number>(Date.now());
+
+  React.useEffect(() => {
+    const elapsed = Date.now() - lastRan.current;
+    const timeout = Math.max(delay - elapsed, 0);
+
+    const id = window.setTimeout(() => {
+      setThrottled(value);
+      lastRan.current = Date.now();
+    }, timeout);
+
+    return () => window.clearTimeout(id);
+  }, [value, delay]);
+
+  return throttled;
+}
+```
+
+```typescript
+// Example usage — fire a retrieveMultiple no more than once every 300ms while typing
+const [term, setTerm] = React.useState('');
+const throttledTerm = useThrottle(term, 300);
+
+React.useEffect(() => {
+  if (!throttledTerm) return;
+  setSearching(true);
+  props.webApi
+    .retrieveMultipleRecords(
+      'contact',
+      `?$select=fullname,contactid&$filter=contains(fullname,'${throttledTerm}')&$top=20`
+    )
+    .then(
+      (response) => {
+        setOptions(response.entities);
+        setSearching(false);
+      },
+      (error) => console.error(error)
+    );
+}, [throttledTerm]);
+```
+
+Tips
+- Prefer throttle for continuous streams (scroll/resize/mousemove)
+- Choose a delay that matches perceived responsiveness (150–300ms typical)
+- Keep side effects idempotent; throttled calls may skip intermediate states
+- Combine with memoization to avoid child re-renders when props don’t change
+
+---
+
+<!-- slide -->
+
+#### Sample Code: Memoization and React Performance
+
+Why: Reduce unnecessary re-renders and expensive recalculations in PCFs when working with large datasets or many child components.
+
+Key tools
+- React.memo: Skip re-render when props are equal
+- useMemo: Cache expensive derived values until dependencies change
+- useCallback: Stabilize function identities passed to children
+
+```typescript
+// Child.tsx — only re-render when relevant props change
+import * as React from 'react';
+
+interface ChildProps {
+  value: number;
+  onIncrement: () => void;
+}
+
+const ChildImpl: React.FC<ChildProps> = ({ value, onIncrement }) => {
+  console.log('Child render');
+  return (
+    <div>
+      <span>Value: {value}</span>
+      <button onClick={onIncrement}>+1</button>
+    </div>
+  );
+};
+
+// Optional custom equality if props are complex
+export const Child = React.memo(
+  ChildImpl,
+  (prev, next) => prev.value === next.value && prev.onIncrement === next.onIncrement
+);
+```
+
+```typescript
+// HelloWorld.tsx — memoize derived data and handlers
+import * as React from 'react';
+import { Child } from './Child';
+
+export const HelloWorld: React.FC = () => {
+  const [count, setCount] = React.useState(0);
+  const [filter, setFilter] = React.useState('');
+
+  // Expensive derived value (simulate heavy calc)
+  const expensiveTotal = React.useMemo(() => {
+    let total = 0;
+    for (let i = 0; i < 100_000; i++) total += i % 3;
+    return total + count;
+  }, [count]);
+
+  // Stable handler identity for children
+  const onIncrement = React.useCallback(() => setCount(c => c + 1), []);
+
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      <input
+        placeholder="Filter"
+        value={filter}
+        onChange={(e) => setFilter((e.target as HTMLInputElement).value)}
+      />
+      <div>Expensive total (memoized): {expensiveTotal}</div>
+      {/* Passing stable callback prevents Child re-render when only filter changes */}
+      <Child value={count} onIncrement={onIncrement} />
+    </div>
+  );
+};
+```
+
+Tips
+- Memoize children that receive stable props or callbacks
+- Prefer memoizing expensive computations; avoid memoizing trivial values
+- Ensure dependencies are accurate to prevent stale data
+- Measure with React DevTools Profiler and add memoization where it helps
+
 ---
 <!-- slide -->
 
