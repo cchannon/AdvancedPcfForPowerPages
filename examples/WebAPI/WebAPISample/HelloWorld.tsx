@@ -51,7 +51,7 @@ export const HelloWorld: React.FC<IHelloWorldProps> = (props) => {
       const payload = {
         name: "Fabrikam Inc.",
         telephone1: "555-0100",
-        description: "Created via PCF ExecuteMultiple Sample"
+        description: "Created via PCF Execute Sample"
       };
 
       // Create the request object with getMetadata function
@@ -83,6 +83,21 @@ export const HelloWorld: React.FC<IHelloWorldProps> = (props) => {
 
   };
 
+  const powerPagesWebApi = async () => {
+    // Retrieve top 50 contacts using Dataverse Web API via props.webApi
+    try {
+      const query = "?$select=fullname,contactid,emailaddress1&$top=50";
+      const result = await props.webApi.retrieveMultipleRecords("contact", query);
+      const count = Array.isArray(result?.entities) ? result.entities.length : 0;
+      console.log("Dataverse Web API contacts (top 50):", result);
+      alert(`Retrieved ${count} contacts via Dataverse Web API`);
+      return result;
+    } catch (err) {
+      console.error(err);
+      alert(`Dataverse Web API error: ${err}`);
+      return null;
+    }
+  };
 
   const retrieveEnvironmentVariableValue = async () => {
     const url = encodeURI(`${props.Uri}RetrieveEnvironmentVariableValue(DefinitionSchemaName=@p1)?@p1='ktcs_ExampleEV'`);
@@ -112,6 +127,7 @@ export const HelloWorld: React.FC<IHelloWorldProps> = (props) => {
       <Button onClick={basicClickHandler}>Click Me!</Button>
       <Button onClick={retrieveEnvironmentVariableValue}>Click Me Too!</Button>
       <Button onClick={validateFetchXmlExpression}>Click Me Three!</Button>
+      <Button onClick={powerPagesWebApi}>Retrieve Contacts (Dataverse)</Button>
     </FluentProvider>
   )
 }

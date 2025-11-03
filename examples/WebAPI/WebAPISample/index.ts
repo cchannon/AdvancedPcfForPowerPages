@@ -34,8 +34,10 @@ export class WebAPISample implements ComponentFramework.ReactControl<IInputs, IO
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
+        //works in MDA, doesn't work in Pages!
         const serviceUri = (context as any).page.getClientUrl();
-        const props: IHelloWorldProps = { name: context.parameters.sampleProperty.raw ?? "", webApi: context.webAPI, Uri: serviceUri + "/api/data/v9.2/" };
+
+        const props: IHelloWorldProps = { name: context.parameters.sampleProperty.raw ?? "", webApi: context.webAPI, Uri: serviceUri };
         return React.createElement(
             HelloWorld, props
         );
